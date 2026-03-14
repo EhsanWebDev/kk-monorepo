@@ -1,0 +1,62 @@
+1. Fix packages/types/package.json
+The types condition must come before default, and add a main fallback:
+{
+  "name": "@repo/types",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "node --watch index.ts",
+    "build": "tsc -b"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*"
+  },
+  "dependencies": {
+    "zod": "^4.3.6"
+  }
+}
+Key changes: added "main" and "types" top-level fields, and wrapped exports under "." with proper condition ordering.
+
+2. Fix packages/types/tsconfig.json
+Make sure it emits declarations:
+{
+  "extends": "@repo/typescript-config/base.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./",
+    "declaration": true,
+    "declarationMap": true,
+    "emitDeclarationOnly": false
+  },
+  "include": ["**/*.ts"],
+  "exclude": ["dist", "node_modules"]
+}
+
+3. Make sure index.ts exports everything
+typescript// packages/types/index.ts
+export * from "./zodTypes/device";
+
+4. Fix turbo.json — ensure types is built first
+json{
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**"]
+    }
+  }
+}
+The ^build means "build my dependencies first" — so @repo/types will always be compiled before your backend.
+
+5. Build and reinstall
+bash# From repo root
+pnpm install
+pnpm turbo build --filter=@repo/types

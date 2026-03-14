@@ -1,0 +1,27 @@
+{
+  "name": "@repo/types",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "tsx --watch index.ts",
+    "build": "tsc --project tsconfig.cjs.json && tsc --project tsconfig.esm.json"
+  },
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/cjs/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/cjs/index.js",
+      "require": "./dist/cjs/index.js",
+      "types": "./dist/cjs/index.d.ts"
+    }
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "tsx": "^4.21.0"
+  },
+  "dependencies": {
+    "zod": "^4.3.6"
+  }
+}
